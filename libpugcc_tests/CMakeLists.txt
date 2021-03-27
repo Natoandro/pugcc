@@ -9,3 +9,8 @@ add_gtest(lexer_lexer
   ${LIB_SOURCE_DIR}/lexer/source.h
   ${LIB_SOURCE_DIR}/error.h
 )
+
+add_gtest(utils.record
+  utils/record.test.cpp
+  ${LIB_SOURCE_DIR}/utils/record.h
+)
