@@ -9,7 +9,7 @@ TEST(Source, EmptySource)
 {
   std::string str{};
   pug::Source source{ str };
-  EXPECT_TRUE(source.empty());
+  EXPECT_TRUE(source.isEmpty());
 }
 
 TEST(Source, NonEmptySource)
@@ -19,12 +19,12 @@ TEST(Source, NonEmptySource)
 
   pug::Source src{ "test string" };
 
-  EXPECT_FALSE(src.empty());
+  EXPECT_FALSE(src.isEmpty());
   EXPECT_EQ(src.size(), 11);
-  EXPECT_EQ(src.getIndex(src.find(Space)), 4);
+  EXPECT_EQ(src.pos(src.Find(Space)), 4);
   EXPECT_TRUE(src.frontIs(Alpha));
-  EXPECT_EQ(src.getIndex(src.find(Alpha)), 0);
-  EXPECT_EQ(src.getIndex(src.findNot(Alpha)), 4);
+  EXPECT_EQ(src.pos(src.Find(Alpha)), 0);
+  EXPECT_EQ(src.pos(src.FindNot(Alpha)), 4);
 }
 
 TEST(InputSource, ReadingFromInputSource)
@@ -34,12 +34,12 @@ TEST(InputSource, ReadingFromInputSource)
   auto Space = [](char ch) { return ch == ' '; };
   auto Alpha = [](char ch) { return std::isalpha(ch); };
 
-  pug::InputSource src{ "this is a test input" };
-  EXPECT_EQ(src.readUntil(Space), "this"sv);
-  src.discard(1);
-  EXPECT_EQ(src.currentIndex(), 5);
-  src.discardUntilNot(Alpha);
-  EXPECT_TRUE(src.frontIs(Space));
-  src.discardUntil(Alpha);
-  EXPECT_EQ((std::string)src, "a test input"s);
+  pug::InputSource input{ "this is a test input" };
+  EXPECT_EQ(input.ReadUntil(Space), "this"sv);
+  input.Discard(1);
+  EXPECT_EQ(input.offset(), 5);
+  input.DiscardUntilNot(Alpha);
+  EXPECT_TRUE(input.frontIs(Space));
+  input.DiscardUntil(Alpha);
+  EXPECT_EQ((std::string)input, "a test input"s);
 }
