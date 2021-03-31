@@ -4,62 +4,30 @@
 #include <algorithm>
 #include <cstddef>
 #include <memory>
+#include <span>
 #include <stdexcept>
 #include <string>
 #include <string_view>
 #include <type_traits>
 
+namespace pug::outputbuffer_internal {
+  using Buffer = std::span<char>;
+  using Iter = Buffer::iterator;
+
+  // no range check
+  inline Iter Copy(std::string_view src, Iter dest)
+  {
+    return std::copy_n(src.begin(), src.size(), dest);
+  }
+} // namespace pug::outputbuffer_internal
+
 namespace pug {
-
-  // TODO: use std::span<char>
-
-  class Buffer {
-  public:
-    using Size = std::size_t;
-    using Iter = char*;
-    using ConstIter = const char*;
-
-    Buffer() = default;
-    Buffer(char* start, Size size): start_{ start } { finish_ = start_ + size; }
-    Buffer(std::string& str): Buffer{ str.data(), str.size() } {}
-    Buffer(const Buffer&) = default;
-    Buffer(Buffer&&) = delete;
-
-    Buffer& operator=(const Buffer&) = default;
-    Buffer& operator=(Buffer&&) = delete;
-
-    size_t size() const { return end() - begin(); }
-
-    Iter begin() { return start_; }
-    ConstIter begin() const { return start_; }
-
-    Iter end() { return finish_; }
-    ConstIter end() const { return finish_; }
-
-    operator std::string_view() const { return { begin(), size() }; }
-
-    /* no range check */
-    void Write(Size offset, std::string_view buf)
-    {
-      std::copy_n(buf.begin(), buf.size(), begin() + offset);
-    }
-
-    /* no range check */
-    Iter Write(Iter iter, std::string_view buf)
-    {
-      return std::copy_n(buf.begin(), buf.size(), iter);
-    }
-
-  private:
-    char* start_;
-    char* finish_;
-  };
 
   class OutputBuffer {
   public:
-    using Size = Buffer::Size;
-    using Iter = Buffer::Iter;
-    using ConstIter = Buffer::ConstIter;
+    using Buffer = std::span<char>;
+    using Size = Buffer::size_type;
+    using Iter = Buffer::iterator;
 
   public:
     OutputBuffer(Buffer buffer = {}): buffer_{ buffer }
@@ -70,25 +38,22 @@ namespace pug {
     OutputBuffer(const OutputBuffer&) = delete;
     OutputBuffer(OutputBuffer&&) = delete;
 
+    Iter begin() const { return buffer_.begin(); }
+    Iter end() const { return current_; }
+
     Size size() const { return end() - begin(); }
-    Size capacity() const { return buffer_.size(); }
 
-    Iter begin() { return buffer_.begin(); }
-    ConstIter begin() const { return buffer_.begin(); }
-
-    Iter end() { return current_; }
-    ConstIter end() const { return current_; }
-
-    /* current content of the output buffer, which may change upon overflow */
-    operator std::string_view() const { return { begin(), size() }; }
+    /* current content of the output buffer */
+    operator std::string_view() const { return { buffer_.data(), size() }; }
 
     void Append(std::string_view buf)
     {
+      using namespace outputbuffer_internal;
       if (avail() >= buf.size()) {
-        current_ = buffer_.Write(end(), buf);
+        current_ = Copy(buf, current_);
       } else {
         const Size count = avail();
-        buffer_.Write(end(), { buf.begin(), avail() });
+        Copy(buf.substr(0, count), current_);
         buf.remove_prefix(count);
         HandleOverflow();
         Append(buf);
