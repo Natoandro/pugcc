@@ -23,9 +23,10 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
                  ${CMAKE_CURRENT_BINARY_DIR}/googletest-build
                  EXCLUDE_FROM_ALL)
 
-macro(add_gtest TESTNAME)
+function(add_gtest NAME)
+  set(TESTNAME "test.${NAME}")
   add_executable(${TESTNAME} ${ARGN})
   target_link_libraries(${TESTNAME} gtest gmock gtest_main)
   set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
-  add_test(NAME "${TESTNAME}_test" COMMAND ${TESTNAME})
-endmacro()
+  add_test(NAME ${TESTNAME} COMMAND ${TESTNAME})
+endfunction()
