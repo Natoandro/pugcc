@@ -11,6 +11,8 @@ set(CMAKE_CXX CMAKE_C_STANDARD_REQUIRED True)
 
 add_subdirectory(libpugcc)
 
+include_directories(${CURRENT_SOURCE_DIR}/libpugcc/include)
+
 if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   enable_testing()
   include(gtest.cmake)
