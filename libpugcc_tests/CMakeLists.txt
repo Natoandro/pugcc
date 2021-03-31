@@ -21,3 +21,9 @@ add_gtest(io.output_buffer
   io/output_buffer.test.cpp
   ${LIB_SOURCE_DIR}/include/pugcc/io/output_buffer.h
 )
+
+add_gtest(ast.element
+  ast/element.test.cpp
+  ${LIB_SOURCE_DIR}/ast/element.h
+  ${LIB_SOURCE_DIR}/ast/element.cpp
+)
