@@ -1,6 +1,7 @@
 #ifndef _LIBPUGCC_AST_NODE_H_
 #define _LIBPUGCC_AST_NODE_H_
 
+#include <concepts>
 #include <cstddef>
 #include <memory>
 #include <numeric>
@@ -44,23 +45,16 @@ namespace pug {
   };
   static_assert(Renderable<NodeList>);
 
-  // TODO: use concept
-  template <typename T>
-  constexpr bool isNode = std::is_base_of_v<Node, std::decay_t<T>>;
-
   class ParentNode {
   public:
-    template <class Child, typename... Args>
-    std::enable_if_t<isNode<Child>, Child>& AppendChild(
-      std::in_place_t,
-      Args&&... args)
+    template <std::derived_from<Node> Child, typename... Args>
+    Child& AppendChild(std::in_place_t, Args&&... args)
     {
       return AppendChild(std::make_unique<Child>(std::forward<Args>(args)...));
     }
 
-    template <class Child>
-    std::enable_if_t<isNode<Child>, Child>& AppendChild(
-      std::unique_ptr<Child>&& ptr)
+    template <std::derived_from<Node> Child>
+    Child& AppendChild(std::unique_ptr<Child>&& ptr)
     {
       children_.push_back(std::move(ptr));
       return static_cast<Child&>(*children_.back());
