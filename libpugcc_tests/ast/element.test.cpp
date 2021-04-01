@@ -22,13 +22,13 @@ protected:
 
 TEST_F(AttrListTest, AttrList)
 {
-  EXPECT_EQ("", std::string{ list0 });
+  EXPECT_EQ("", to_string(list0));
 
-  EXPECT_EQ(" name=\"element\"", std::string{ list1 });
+  EXPECT_EQ(" name=\"element\"", to_string(list1));
 
   EXPECT_EQ(
     " id=\"ActionButton\" title=\"Button action...\"",
-    std::string{ list2 });
+    to_string(list2));
 }
 
 class ClassListTest : public ::testing::Test {
@@ -53,18 +53,18 @@ protected:
 
 TEST_F(ClassListTest, ClassList)
 {
-  EXPECT_EQ("", std::string{ cl0 });
+  EXPECT_EQ("", to_string(cl0));
 
   EXPECT_EQ(3, cl1.Render());
-  EXPECT_EQ("foo", std::string{ cl1 });
+  EXPECT_EQ("foo", to_string(cl1));
 
   // ClassList current implementation is std::set -- ordered set
-  EXPECT_EQ("bar baz", std::string{ cl2 });
+  EXPECT_EQ("bar baz", to_string(cl2));
 
   cl2.insert("bar");
   EXPECT_EQ(7, cl2.Render());
 
-  EXPECT_EQ("bar baz foooo", std::string{ cl3 });
+  EXPECT_EQ("bar baz foooo", to_string(cl3));
 }
 
 class ElementTest : public ::testing::Test {
@@ -86,18 +86,18 @@ protected:
 
 TEST_F(ElementTest, Element)
 {
-  EXPECT_EQ("<br>", std::string{ el0 });
+  EXPECT_EQ("<br>", to_string(el0));
 
   EXPECT_EQ(
     "<link href=\"/static/style.css\" rel=\"stylesheet\">",
-    std::string{ el1 });
+    to_string(el1));
 }
 
 TEST_F(ElementTest, ElementWithClass)
 {
   EXPECT_EQ(
     "<img class=\"button-image image\" src=\"/images/image001.jpg\">",
-    std::string{ el2 });
+    to_string(el2));
 }
 
 class ParentElementTest : public ::testing::Test {
@@ -122,19 +122,19 @@ protected:
 
 TEST_F(ParentElementTest, WithoutChild)
 {
-  EXPECT_EQ("<div></div>", std::string{ p0 });
+  EXPECT_EQ("<div></div>", to_string(p0));
 }
 
 TEST_F(ParentElementTest, WithOneChild)
 {
   EXPECT_EQ(
     "<a href=\"https://localhost:3210/\"><img src=\"/images/mouse.jpg\"></a>",
-    std::string{ p1 });
+    to_string(p1));
 }
 
 TEST_F(ParentElementTest, WithChildren)
 {
   EXPECT_EQ(
     "<ul id=\"member-list\"><li id=\"mb1\"></li><li id=\"mb2\"></li></ul>",
-    std::string{ p2 });
+    to_string(p2));
 }

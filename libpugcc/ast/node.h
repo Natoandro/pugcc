@@ -13,7 +13,12 @@
 
 namespace pug {
 
-  class Node : public Renderable {};
+  class Node {
+  public:
+    virtual void Render(OutputBuffer& buf) const = 0;
+    virtual std::size_t Render() const = 0;
+  };
+  static_assert(Renderable<Node>);
 
   namespace childlist_internal {
     inline std::size_t size(const std::unique_ptr<Node>& p_node)
@@ -22,22 +27,22 @@ namespace pug {
     }
   } // namespace childlist_internal
 
-  class NodeList : public Renderable,
-                   public std::vector<std::unique_ptr<Node>> {
+  class NodeList : public std::vector<std::unique_ptr<Node>> {
   public:
-    void Render(OutputBuffer& out) const override
+    void Render(OutputBuffer& out) const
     {
       for (auto& p_node : *this) {
         out << *p_node;
       }
     }
 
-    std::size_t Render() const override
+    std::size_t Render() const
     {
       using childlist_internal::size;
       return std::transform_reduce(begin(), end(), 0, std::plus<>(), size);
     }
   };
+  static_assert(Renderable<NodeList>);
 
   // TODO: use concept
   template <typename T>

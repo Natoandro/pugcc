@@ -50,7 +50,7 @@ Element::Render(OutputBuffer& out) const
 {
   out << "<" << tag_name_;
   if (!class_list_.empty())
-    out << " class=\"" << static_cast<std::string>(class_list_) << "\"";
+    out << " class=\"" << to_string(class_list_) << "\"";
   out << attrs_ << ">";
 
   auto* ptr = dynamic_cast<const ParentElement*>(this);

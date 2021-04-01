@@ -18,21 +18,22 @@ namespace pug {
   // pug::Expression
 
   /** Attribute list of an element */
-  class AttrList : public Renderable,
-                   public std::map<std::string, std::string> {
+  class AttrList : public std::map<std::string, std::string> {
   public:
-    void Render(OutputBuffer& buf) const override;
-    std::size_t Render() const override;
+    void Render(OutputBuffer& buf) const;
+    std::size_t Render() const;
   };
+  static_assert(Renderable<AttrList>);
 
   /** Class list
    * Classes are not included in AttrList.
    */
-  class ClassList : public Renderable, public std::set<std::string> {
+  class ClassList : public std::set<std::string> {
   public:
-    void Render(OutputBuffer& buf) const override;
-    std::size_t Render() const override;
+    void Render(OutputBuffer& buf) const;
+    std::size_t Render() const;
   };
+  static_assert(Renderable<ClassList>);
 
   class ParentElement;
 

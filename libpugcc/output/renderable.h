@@ -13,23 +13,28 @@ namespace pug {
 
   class OutputBuffer;
 
-  class Renderable {
-  public:
-    virtual void Render(OutputBuffer& buf) const = 0;
-    virtual std::size_t Render() const = 0;
+  // clang-format off
 
-    explicit operator std::string() const
-    {
-      pug::StringBuffer buf{ Render() };
-      Render(buf);
-      return std::move(buf);
-    }
+  template <typename T>
+  concept Renderable = requires(T& r, OutputBuffer& buf)
+  {
+    { r.Render() } -> std::convertible_to<std::size_t>;
+    { r.Render(buf) };
   };
 
-  inline OutputBuffer& operator<<(OutputBuffer& out, const Renderable& r)
+  // clang-format on
+
+  OutputBuffer& operator<<(OutputBuffer& out, const Renderable auto& r)
   {
     r.Render(out);
     return out;
+  }
+
+  std::string to_string(const Renderable auto& r)
+  {
+    pug::StringBuffer buf{ r.Render() };
+    r.Render(buf);
+    return std::move(buf);
   }
 
 } // namespace pug
