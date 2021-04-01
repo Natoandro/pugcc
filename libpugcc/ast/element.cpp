@@ -70,9 +70,7 @@ Element::Render() const
   // closing tag
   auto* ptr = dynamic_cast<const ParentElement*>(this);
   if (ptr == nullptr) return rv;
-  for (auto& p_child : ptr->children()) {
-    rv += p_child->Render();
-  }
+  rv += ptr->children().Render();
   rv += 3 + tag_name_.size();
   return rv;
 }
