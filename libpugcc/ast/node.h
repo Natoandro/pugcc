@@ -14,6 +14,7 @@
 
 namespace pug {
 
+  /** Base class of all nodes */
   class Node {
   public:
     virtual void Render(OutputBuffer& buf) const = 0;
@@ -21,13 +22,16 @@ namespace pug {
   };
   static_assert(Renderable<Node>);
 
-  namespace childlist_internal {
-    inline std::size_t size(const std::unique_ptr<Node>& p_node)
-    {
-      return p_node->Render();
-    }
-  } // namespace childlist_internal
+} // namespace pug
 
+namespace pug::nodelist_internal {
+  inline std::size_t size(const std::unique_ptr<Node>& p_node)
+  {
+    return p_node->Render();
+  }
+} // namespace pug::nodelist_internal
+
+namespace pug {
   class NodeList : public std::vector<std::unique_ptr<Node>> {
   public:
     void Render(OutputBuffer& out) const
@@ -39,12 +43,13 @@ namespace pug {
 
     std::size_t Render() const
     {
-      using childlist_internal::size;
+      using nodelist_internal::size;
       return std::transform_reduce(begin(), end(), 0, std::plus<>(), size);
     }
   };
   static_assert(Renderable<NodeList>);
 
+  /** Nodes that (can) have children */
   class ParentNode {
   public:
     template <std::derived_from<Node> Child, typename... Args>
